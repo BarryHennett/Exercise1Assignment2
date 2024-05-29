@@ -4,18 +4,17 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SearchView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +25,10 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
     private List<User> userList = new ArrayList<>();
+    private List<User> filteredUserList = new ArrayList<>();
     private DatabaseReference database;
     private String selectedUserId;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,9 +44,10 @@ public class MainActivity extends AppCompatActivity {
         buttonUpdate = findViewById(R.id.buttonUpdate);
         buttonDelete = findViewById(R.id.buttonDelete);
         recyclerView = findViewById(R.id.recyclerView);
+        searchView = findViewById(R.id.searchView);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        userAdapter = new UserAdapter(userList, new UserAdapter.OnItemClickListener() {
+        userAdapter = new UserAdapter(filteredUserList, new UserAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(User user) {
                 editTextName.setText(user.getName());
@@ -86,6 +88,21 @@ public class MainActivity extends AppCompatActivity {
                 deleteUser();
             }
         });
+
+        // Set up the search view
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                filterUsers(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterUsers(newText);
+                return false;
+            }
+        });
     }
 
     private void loadUsers() {
@@ -98,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                     user.setId(snapshot.getKey());
                     userList.add(user);
                 }
-                userAdapter.notifyDataSetChanged();
+                filterUsers(searchView.getQuery().toString());
             }
 
             @Override
@@ -164,5 +181,16 @@ public class MainActivity extends AppCompatActivity {
         editTextEmail.setText("");
         editTextPassword.setText("");
         editTextAge.setText("");
+    }
+
+    private void filterUsers(String query) {
+        filteredUserList.clear();
+        for (User user : userList) {
+            if (user.getName().toLowerCase().contains(query.toLowerCase()) ||
+                    user.getEmail().toLowerCase().contains(query.toLowerCase())) {
+                filteredUserList.add(user);
+            }
+        }
+        userAdapter.notifyDataSetChanged();
     }
 }
