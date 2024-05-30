@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Get references to UI elements
         editTextName = findViewById(R.id.editTextName);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
@@ -58,14 +57,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         recyclerView.setAdapter(userAdapter);
-
-        // Get a reference to the Firebase Realtime Database
         database = FirebaseDatabase.getInstance().getReference();
-
-        // Load existing users
         loadUsers();
 
-        // Set the save button click listener
         buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Set the update button click listener
         buttonUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Set the delete button click listener
         buttonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Set up the search view
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -161,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
 
         clearFields();
     }
-
+    // Delete existing user
     private void deleteUser() {
         if (selectedUserId == null) {
             Toast.makeText(MainActivity.this, "Please select a user to delete", Toast.LENGTH_SHORT).show();
